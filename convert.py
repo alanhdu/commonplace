@@ -17,7 +17,7 @@ def html2md(h):
     md = html2text(h)
     for match in _link.finditer(md):
         s = match.group(0)
-        md = md.replace(s, s.replace("\n", ""))
+        md = md.replace(s, s.replace("\n", "").replace(" ", "%20"))
 
     return md.strip()
 

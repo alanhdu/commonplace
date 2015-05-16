@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}
+<title> Categories </title>
+{% endblock %}
+
+{% block content %}
+
+<div id="home" class="grid post">
+    <div class="unit whole">
+        <article>
+            <section>
+                <ul>
+                    {% for category, count in categories %}
+                    <li> 
+                        <a href="{{ url_for('show_category', category=category) }}">
+                            {{ category }} </a> ({{ count }})
+                    </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        </article>
+    </div>
+</div>
+
+{% endblock content %}

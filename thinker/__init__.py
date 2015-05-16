@@ -36,3 +36,18 @@ def show_tag(tag_name=None):
         if not tag:
             abort(404)
         return render_template("tag.html", tag=tag)
+
+@app.route("/category/<category>")
+@app.route("/category/")
+def show_category(category=None):
+    if category is None:
+        count = db.func.count(Note.category).label("count")
+        query = db.session.query(Note.category, count) \
+                          .group_by(Note.category) \
+                          .order_by(db.desc("count"))
+        return render_template("categories.html", categories=query)
+    else:
+        notes = Note.query.filter(Note.category == category)
+        if not notes.first():
+            abort(404)
+        return render_template("category.html", category=category, notes=notes)
