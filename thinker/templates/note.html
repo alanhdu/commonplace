@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}
-<title> {{ note.title }} </title>
+<title> Note | {{ note.title }} </title>
 {% endblock %}
 
 {% block content %}
@@ -22,7 +22,8 @@
                 <div> <strong> {{ note.category }} </strong> &ndash;
                     <span class="tags">
                         {% for tag in note.tags %}
-                        <span><i class="fa fa-tag"></i>{{ tag.name }}</span>
+                        <span> <a href="{{ url_for('show_tag', tag_name=tag.name) }}">
+                                <i class="fa fa-tag"></i>{{ tag.name }}</a></span>
                         {% endfor %}
                     </span>
                 </div>

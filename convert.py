@@ -80,12 +80,11 @@ def process(note_name, category="misc", evernote="data/_evernote_raw"):
     if not os.path.exists(path):
         os.makedirs(path)
 
-
-    if os.path.isdir(os.path.join(evernote, files_path)):
+    if os.path.isdir(os.path.join(evernote, category, files_path)):
         newpath = "thinker" + fpath
         if os.path.isdir(newpath):
             shutil.rmtree(newpath)
-        shutil.copytree(os.path.join(evernote, files_path),
+        shutil.copytree(os.path.join(evernote, category, files_path),
                         newpath)
         data["fpath"] = fpath
 

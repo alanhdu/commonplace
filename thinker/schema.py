@@ -20,10 +20,10 @@ class Note(db.Model):
 
     source = db.Column(db.String, nullable=True)
     clip = db.Column(db.Text, nullable=True)
-    fpath = db.Column(db.String, nullable=True)
+    fpath = db.Column(db.String, nullable=True, unique=True)
 
     tags = db.relationship("Tag", secondary=tags,
-                           backref=db.backref("pages", lazy="dynamic"))
+                           backref=db.backref("notes", lazy="dynamic"))
 
 class Tag(db.Model):
     __tablename__ = "tag"
