@@ -1,5 +1,7 @@
 import glob
+import hashlib
 import json
+import re
 import os
 import shutil
 
@@ -8,6 +10,16 @@ from html2text import html2text
 from lxml import html, etree
 import toolz
 from slugify import slugify_filename
+
+_link = re.compile(r"\[.*?\]\((.*?)\)", re.DOTALL)
+
+def html2md(h):
+    md = html2text(h)
+    for match in _link.finditer(md):
+        s = match.group(0)
+        md = md.replace(s, s.replace("\n", ""))
+
+    return md.strip()
 
 def process_data(meta):
     data = {}
@@ -30,6 +42,7 @@ def process_data(meta):
 
 def process(note_name, evernote="data/_evernote_raw"):
     files_path = note_name + "_files/"
+    fpath = "/static/files/" + hashlib.md5(note_name.encode()).hexdigest() + "/"
     with open(os.path.join(evernote, note_name + ".html")) as fin:
         root = html.fromstring(fin.read())
 
@@ -41,41 +54,48 @@ def process(note_name, evernote="data/_evernote_raw"):
 
     for a in main.xpath("//a"):
         if 'href' in a.attrib and files_path in a.attrib["href"]:
-            href = a.attrib["href"].replace(files_path, "_files/")
+            href = a.attrib["href"].replace(files_path, fpath)
             a.attrib["href"] = href
 
-    for img in main.xpath("//a"):
+    for img in main.xpath("//img"):
         if 'src' in img.attrib and files_path in img.attrib["src"]:
-            src = img.attrib["src"].replace(files_path, "_files/")
-            img.attrib = src
+            src = img.attrib["src"].replace(files_path, fpath)
+            img.attrib["src"] = src
 
+    clip = None
     if "source" in data:
         div = main.xpath("div")[0]
         if div.text is not None:
-            data["text"] = div.text
+            text = div.text
         elif div.xpath("div"):
             text = etree.tostring(div.xpath("div")[0]).decode()
-            data["text"] = html2text(text)
+            text = html2md(text)
         else:
-            data["text"] = ""
-        data["clip"] = html2text(etree.tostring(div).decode())
+            text = ""
+        clip = html2md(etree.tostring(div).decode())
     else:
-        data["text"] = html2text(etree.tostring(main).decode())
+        text = html2md(etree.tostring(main).decode())
 
     path = os.path.join("data/raw", 'misc', slugify_filename(data["title"]))
     if not os.path.exists(path):
         os.makedirs(path)
 
-    with open(os.path.join(path, "data.json"), "w") as fout:
-        json.dump(data, fout)
 
     if os.path.isdir(os.path.join(evernote, files_path)):
-        newpath = os.path.join(path, "_files/")
+        newpath = "thinker" + fpath
         if os.path.isdir(newpath):
             shutil.rmtree(newpath)
         shutil.copytree(os.path.join(evernote, files_path),
-                        os.path.join(path, "_files/"))
-            
+                        newpath)
+        data["fpath"] = fpath
+
+    with open(os.path.join(path, "data.json"), "w") as fout:
+        json.dump(data, fout, sort_keys=True, indent=4)
+    with open(os.path.join(path, "note.md"), "w") as fout:
+        fout.write(text)
+    if clip is not None:
+        with open(os.path.join(path, "clip.md"), "w") as fout:
+            fout.write(clip)
 
 if __name__ == "__main__":
     for fname in glob.glob("data/_evernote_raw/*.html"):

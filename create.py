@@ -10,6 +10,13 @@ from thinker import db, Note, Tag, Link
 def create_note(path):
     with open(os.path.join(path, "data.json")) as fin:
         data = json.load(fin)
+    with open(os.path.join(path, "note.md")) as fin:
+        data["text"] = fin.read()
+    try:
+        with open(os.path.join(path, "clip.md")) as fin:
+            data["clip"] = fin.read()
+    except IOError:
+        pass
 
     note = Note.query.filter(Note.title == data["title"]).first()
     if not note:
@@ -26,13 +33,13 @@ def create_note(path):
         if not t:
             t = Tag(name=tag)
             db.session.add(t)
-            db.session.commit()
         note.tags.append(t)
 
     db.session.add(note)
-    db.session.commit()
     
 if __name__ == "__main__":
     db.create_all()
     for path in glob.glob("data/raw/misc/*"):
         create_note(path)
+        
+    db.session.commit()
