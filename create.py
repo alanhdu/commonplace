@@ -39,7 +39,7 @@ def create_note(path):
     
 if __name__ == "__main__":
     db.create_all()
-    for path in glob.glob("data/raw/misc/*"):
+    for path in glob.glob("data/raw/*/*"):
         create_note(path)
         
     db.session.commit()

@@ -40,17 +40,17 @@ def process_data(meta):
             raise KeyError(key + " not handled") 
     return data
 
-def process(note_name, evernote="data/_evernote_raw"):
+def process(note_name, category="misc", evernote="data/_evernote_raw"):
     files_path = note_name + "_files/"
     fpath = "/static/files/" + hashlib.md5(note_name.encode()).hexdigest() + "/"
-    with open(os.path.join(evernote, note_name + ".html")) as fin:
+    with open(os.path.join(evernote, category, note_name + ".html")) as fin:
         root = html.fromstring(fin.read())
 
     meta, main = root.xpath("body/div")
 
     data = process_data(meta)
     data["title"] = root.xpath("head/title")[0].text
-    data["category"] = "misc"
+    data["category"] = category
 
     for a in main.xpath("//a"):
         if 'href' in a.attrib and files_path in a.attrib["href"]:
@@ -76,7 +76,7 @@ def process(note_name, evernote="data/_evernote_raw"):
     else:
         text = html2md(etree.tostring(main).decode())
 
-    path = os.path.join("data/raw", 'misc', slugify_filename(data["title"]))
+    path = os.path.join("data/raw", category, slugify_filename(data["title"]))
     if not os.path.exists(path):
         os.makedirs(path)
 
@@ -98,15 +98,16 @@ def process(note_name, evernote="data/_evernote_raw"):
             fout.write(clip)
 
 if __name__ == "__main__":
-    for fname in glob.glob("data/_evernote_raw/*.html"):
-        fname = os.path.split(fname)[-1]
+    for fname in glob.glob("data/_evernote_raw/*/*.html"):
+        path, fname = os.path.split(fname)
+        __, category = os.path.split(path)
         note_name = os.path.splitext(fname)[0]
 
-        if note_name == "Evernote_index":
+        if note_name.lower() == category.lower() + "_index":
             continue
 
         try:
-            process(note_name)
+            process(note_name, category=category)
         except:
             print(note_name)
             raise
