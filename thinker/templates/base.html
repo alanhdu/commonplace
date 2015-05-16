@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:og="og: http://ogp.me/ns#">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="title" content="Notes" >
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        {% block title %}
+        {% endblock %}
+
+        <!-- Custom CSS -->
+        <link rel="stylesheet" href="/static/css/style.css">
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    </head>
+    <body class="wrap">
+      <!--[if lt IE 8]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+      <![endif]-->
+        <header>
+          <h1 class="site-title"><a href="/"> Notes </a></h1>
+          <nav class="main-nav">
+            <a href="#" class="opener show-on-mobiles">...</a>
+            <div class="clear-opener show-on-mobiles"></div>
+            <div class="grid">
+              <ul>
+                <li><a href="/"><i class="fa fa-home"></i>Home</a></li>
+                <li><a href="/tags.html"><i class="fa fa-tags"></i>Tags</a></li>
+                <li><a href="/categories.html"><i class="fa fa-book"></i>Categories</a></li>
+                <li><a href="/about.html"><i class="fa fa-info-circle"></i>About</a></li>
+              </ul>
+            </div>
+          </nav>
+        </header>
+
+      <section class="content">
+          {% block content %}
+          {% endblock %}
+      </section>
+
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML-full"> </script>
+      <script type="text/x-mathjax-config">
+        MathJax.Hub.Config({
+            "HTML-CSS": {
+                styles: {
+                    '.MathJax_Display': {
+                        "margin": 0
+                    }
+                }
+            }
+        });
+      </script>
+    </body>
+</html>

@@ -1,35 +1,44 @@
-import glob
+import datetime as dt
 
-from bulbs.neo4jserver import Graph, Config, NEO4J_URI
-from bulbs.model import Node, Relationship
-from bulbs.property import String, DateTime
-from bulbs.utils import current_datetime
+from . import db
 
-config = Config(NEO4J_URI, "neo4j", "testing")
-graph = Graph(config)
+tags = db.Table("tags",
+            db.Column("tag_id", db.Integer, db.ForeignKey("tag.id")),
+            db.Column("note_id", db.Integer, db.ForeignKey("note.id")))
 
-class Tag(Node):
-    element_type = "tag"
-    name = String(nullable=False)
+class Note(db.Model):
+    __tablename__ = "note"
+    id = db.Column(db.Integer, primary_key=True)
 
-class Notes(Node):
-    element_type = "note"
+    title = db.Column(db.String, nullable=False, unique=True)
+    text = db.Column(db.Text, nullable=False)
+    category = db.Column(db.String, nullable=False, default="misc")
 
-    title = String(nullable=False, indexed=True)
-    text = String(nullable=False, indexed=True)
-    category = String(nullable=False, default="misc", indexed=True)
+    created = db.Column(db.DateTime, nullable=False, default=dt.datetime.now)
+    updated = db.Column(db.DateTime, nullable=False, default=dt.datetime.now,
+                        onupdate=dt.datetime.now)
 
-    created = DateTime(default=current_datetime, nullable=False)
-    updated = DateTime(default=current_datetime, nullable=False)
+    source = db.Column(db.String, nullable=True)
+    clip = db.Column(db.Text, nullable=True)
+    fpath = db.Column(db.String, nullable=True)
 
-    source = String(nullable=True)
-    clip = String(nullable=True, indexed=True)
-    fpath = String(nullable=True)
+    tags = db.relationship("Tag", secondary=tags,
+                           backref=db.backref("pages", lazy="dynamic"))
 
-class About(Relationship):
-    label = "about"
-    created = DateTime(default=current_datetime, nullable=False)
+class Tag(db.Model):
+    __tablename__ = "tag"
 
-class Linked(Relationship):
-    label = "linked"
-    created = DateTime(default=current_datetime, nullable=False)
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, unique=True)
+
+class Link(db.Model):
+    __tablename__ = "link"
+
+    id = db.Column(db.Integer, primary_key=True)
+    src_id = db.Column(db.Integer, db.ForeignKey("note.id"))
+    dest_id = db.Column(db.Integer, db.ForeignKey("note.id"))
+
+    src = db.relationship("Note", foreign_keys=src_id,
+                          backref=db.backref("outgoing"))
+    dest = db.relationship("Note", foreign_keys=dest_id,
+                           backref=db.backref("incoming"))

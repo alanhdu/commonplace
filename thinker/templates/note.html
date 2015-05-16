@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}
+<title> {{ note.title }} </title>
+{% endblock %}
+
+{% block content %}
+
+<div id="home" class="grid post">
+<div class="unit whole">
+<article>
+	<header>
+		<h1>{{ note.title }}</h1>
+                <div> Created: <time class="timeago postlist-meta" datetime="{{ note.created.ctime() }}">
+                        <i class="fa fa-calendar"></i> {{ note.created.ctime() }}
+                </time> </div>
+
+                <div> Updated: <time class="timeago postlist-meta" datetime="{{ note.updated.ctime() }}">
+                    <i class="fa fa-calendar"></i> {{ note.updated.ctime() }}
+                </time> </div>
+
+                <div> <strong> {{ note.category }} </strong> &ndash;
+                    <span class="tags">
+                        {% for tag in note.tags %}
+                        <span><i class="fa fa-tag"></i>{{ tag.name }}</span>
+                        {% endfor %}
+                    </span>
+                </div>
+                {% if note.source %}
+                    <a href="{{ note.source }}"> {{ note.source }} </a>
+                {% endif %}
+
+	</header>
+	<section>
+            <h2> Notes </h2>
+            {{ note.text | markdown }}
+	</section>
+        {% if note.clip %}
+        <hr/>
+        <section>
+            <h2> Original Clipping </h2>
+            {{ note.clip | markdown }}
+        </section>
+        {% endif %}
+</article>
+</div>
+</div>
+
+{% endblock content %}

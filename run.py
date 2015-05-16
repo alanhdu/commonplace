@@ -1,4 +1,5 @@
-from thinker import db, app
+from thinker import app
 
+if __name__  == "__main__":
+    app.run(debug=True)
 
-db.create_all()
