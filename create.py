@@ -4,7 +4,7 @@ import os
 
 from dateutil.parser import parse as dateparse
 
-from commonplace import db, Note, Tag, Link
+from commonplace import db, Note, Tag
 
 
 def create_note(path):
@@ -12,11 +12,6 @@ def create_note(path):
         data = json.load(fin)
     with open(os.path.join(path, "note.md")) as fin:
         data["text"] = fin.read()
-    try:
-        with open(os.path.join(path, "clip.md")) as fin:
-            data["clip"] = fin.read()
-    except IOError:
-        pass
 
     note = Note.query.filter(Note.title == data["title"]).first()
     if not note:

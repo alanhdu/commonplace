@@ -19,7 +19,6 @@ class Note(db.Model):
                         onupdate=dt.datetime.now)
 
     source = db.Column(db.String, nullable=True)
-    clip = db.Column(db.Text, nullable=True)
     fpath = db.Column(db.String, nullable=True, unique=True)
 
     tags = db.relationship("Tag", secondary=tags,
@@ -32,14 +31,19 @@ class Tag(db.Model):
     name = db.Column(db.String, unique=True, index=True)
 
 class Annotation(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-
-class Link(db.Model):
-    __tablename__ = "link"
+    __tablename__ = "annotation"
 
     id = db.Column(db.Integer, primary_key=True)
-    src_id = db.Column(db.Integer, db.ForeignKey("note.id"))
-    dest_id = db.Column(db.Integer, db.ForeignKey("note.id"))
+
+    created = db.Column(db.DateTime, nullable=False, default=dt.datetime.now)
+    updated = db.Column(db.DateTime, nullable=False, default=dt.datetime.now,
+                        onupdate=dt.datetime.now)
+
+    src_id = db.Column(db.Integer, db.ForeignKey("note.id"), index=True)
+    dest_id = db.Column(db.Integer, db.ForeignKey("note.id"), nullable=True)
+
+    number = db.Column(db.Integer, index=True)
+    text = db.Column(db.Text)
 
     src = db.relationship("Note", foreign_keys=src_id,
                           backref=db.backref("outgoing"))

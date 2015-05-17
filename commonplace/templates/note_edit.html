@@ -15,11 +15,6 @@
     Note: <div id="epiceditor-note"> </div>
         <textarea style="display: None" name="text" id="note-md">{{ note.text }}</textarea>
 
-    {% if note.clip %}
-    Clip <div id="epiceditor-clip"> </div> 
-        <textarea style="display: None" name="clip" id="clip-md">{{ note.clip }}</textarea>
-    {% endif %}
-
     <input type="submit">
 
 </form>
@@ -34,14 +29,5 @@
     };
     var note_editor = new EpicEditor(note_opts).load();
 
-    {% if note.clip %}
-    var clip_opts = {
-        container: 'epiceditor-clip',
-        textarea: "clip-md",
-        basePath: '/static/epiceditor',
-        clientSideStorage: false,
-    };
-    var clip_editor = new EpicEditor(clip_opts).load();
-    {% endif %}
 </script>
 {% endblock %}

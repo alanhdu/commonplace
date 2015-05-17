@@ -7,7 +7,7 @@ Markdown(app)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:////home/alan/workspace/commonplace/test.db"
 db = SQLAlchemy(app)
 
-from .schema import Note, Tag, Link, tags
+from .schema import Note, Tag, Annotation, tags
 from .api import api
 
 app.register_blueprint(api, url_prefix="/api")
@@ -30,6 +30,13 @@ def edit_note(note_id):
         abort(404)
     return render_template("note_edit.html", note=note,
                            tags=[tag.name for tag in note.tags])
+
+@app.route("/note/<int:note_id>/annotate")
+def annotate_note(note_id):
+    note = Note.query.filter(Note.id == note_id).first()
+    if not note:
+        abort(404)
+    return render_template("note_annotate.html", note=note)
 
 @app.route("/tag/<tag_name>")
 @app.route("/tag/")

@@ -1,10 +1,11 @@
 {% extends "base.html" %}
 
 {% block title %}
-<title> Note | {{ note.title }} </title>
+<title> Note Annotation | {{ note.title }} </title>
 {% endblock %}
 
 {% block content %}
+
 
 <article>
 	<header>
@@ -32,8 +33,22 @@
 	</header>
 	<section>
             <h2> Notes </h2>
-            {{ note.text | markdown }}
+            <pre id="note-md"> {{ note.text }} </pre>
 	</section>
 </article>
 
-{% endblock content %}
+<button id="submit-annotations"> Submit </button>
+
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
+<script src="http://assets.annotateit.org/annotator/v1.1.0/annotator-full.min.js"></script>
+<link rel="stylesheet" href="http://assets.annotateit.org/annotator/v1.1.0/annotator.min.css">
+<script type="text/javascript">
+    var note_ann = $('#note-md').annotator();
+
+    $("#submit-annotations").click(function() {
+        var note = $("#note-md").text;
+        alert("hello!");
+    });
+</script>
+
+{% endblock %}

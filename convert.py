@@ -62,19 +62,7 @@ def process(note_name, category="misc", evernote="data/_evernote_raw"):
             src = img.attrib["src"].replace(files_path, fpath)
             img.attrib["src"] = src
 
-    clip = None
-    if "source" in data:
-        div = main.xpath("div")[0]
-        if div.text is not None:
-            text = div.text
-        elif div.xpath("div"):
-            text = etree.tostring(div.xpath("div")[0]).decode()
-            text = html2md(text)
-        else:
-            text = ""
-        clip = html2md(etree.tostring(div).decode())
-    else:
-        text = html2md(etree.tostring(main).decode())
+    text = html2md(etree.tostring(main).decode())
 
     path = os.path.join("data/raw", category, slugify_filename(data["title"]))
     if not os.path.exists(path):
@@ -92,9 +80,6 @@ def process(note_name, category="misc", evernote="data/_evernote_raw"):
         json.dump(data, fout, sort_keys=True, indent=4)
     with open(os.path.join(path, "note.md"), "w") as fout:
         fout.write(text)
-    if clip is not None:
-        with open(os.path.join(path, "clip.md"), "w") as fout:
-            fout.write(clip)
 
 if __name__ == "__main__":
     for fname in glob.glob("data/_evernote_raw/*/*.html"):

@@ -12,7 +12,7 @@ def _pick(whitelist, d):
     return toolz.keyfilter(lambda u: u in whitelist, d)
 
 def _update_note(note, request):
-    whitelist = {"title", "text", "clip", "source", "category"}
+    whitelist = {"title", "text", "source", "category"}
     for key, value in _pick(whitelist, request.form).items():
         setattr(note, key, value)
 
