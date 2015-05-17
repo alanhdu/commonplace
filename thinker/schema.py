@@ -29,7 +29,7 @@ class Tag(db.Model):
     __tablename__ = "tag"
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, unique=True)
+    name = db.Column(db.String, unique=True, index=True)
 
 class Link(db.Model):
     __tablename__ = "link"
