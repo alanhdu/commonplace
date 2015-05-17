@@ -13,15 +13,11 @@
     Tags <input type="text" name="tags" size=60 value="{{ tags }}"> <br/>
 
     Note: <div id="epiceditor-note"> </div>
-        <textarea style="display: None" name="text" id="note-md">
-            {{ note.text }}
-        </textarea>
+        <textarea style="display: None" name="text" id="note-md">{{ note.text }}</textarea>
 
     {% if note.clip %}
     Clip <div id="epiceditor-clip"> </div> 
-        <textarea style="display: None" name="clip" id="clip-md">
-            {{ note.clip }}
-        </textarea>
+        <textarea style="display: None" name="clip" id="clip-md">{{ note.clip }}</textarea>
     {% endif %}
 
     <input type="submit">
