@@ -6,21 +6,17 @@
 
 {% block content %}
 
-<div id="home" class="grid post">
-    <div class="unit whole">
-        <article>
-            <header>
-                <h1>{{ tag.name }} ({{ tag.notes.count() }})</h1>
-            </header>
-            <section>
-                <ul>
-                    {% for note in tag.notes %}
-                    <li> <a href="{{ url_for('show_note', note_id=note.id) }}"> {{ note.title }} </a> </li>
-                    {% endfor %}
-                </ul>
-            </section>
-        </article>
-    </div>
-</div>
+<article>
+    <header>
+        <h1>{{ tag.name }} ({{ tag.notes.count() }})</h1>
+    </header>
+    <section>
+        <ul>
+            {% for note in tag.notes %}
+            <li> <a href="{{ url_for('show_note', note_id=note.id) }}"> {{ note.title }} </a> </li>
+            {% endfor %}
+        </ul>
+    </section>
+</article>
 
 {% endblock content %}

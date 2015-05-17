@@ -6,21 +6,17 @@
 
 {% block content %}
 
-<div id="home" class="grid post">
-    <div class="unit whole">
-        <article>
-            <section>
-                <ul>
-                    {% for tag, count in tags %}
-                    <li> 
-                        <a href="{{ url_for('show_tag', tag_name=tag.name) }}">
-                            {{ tag.name }} </a> ({{ count }})
-                    </li>
-                    {% endfor %}
-                </ul>
-            </section>
-        </article>
-    </div>
-</div>
+<article>
+    <section>
+        <ul>
+            {% for tag, count in tags %}
+            <li> 
+                <a href="{{ url_for('show_tag', tag_name=tag.name) }}">
+                    {{ tag.name }} </a> ({{ count }})
+            </li>
+            {% endfor %}
+        </ul>
+    </section>
+</article>
 
 {% endblock content %}
