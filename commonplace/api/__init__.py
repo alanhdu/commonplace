@@ -2,9 +2,8 @@ import json
 
 from flask import Blueprint, request, redirect, url_for
 import toolz
-import ipdb
 
-from thinker import db, Note, Tag
+from .. import db, Note, Tag
 
 api = Blueprint('api', __name__)
 

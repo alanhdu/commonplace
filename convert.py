@@ -81,7 +81,7 @@ def process(note_name, category="misc", evernote="data/_evernote_raw"):
         os.makedirs(path)
 
     if os.path.isdir(os.path.join(evernote, category, files_path)):
-        newpath = "thinker" + fpath
+        newpath = "commonplace" + fpath
         if os.path.isdir(newpath):
             shutil.rmtree(newpath)
         shutil.copytree(os.path.join(evernote, category, files_path),

@@ -1,6 +1,6 @@
 data/*
 test.db
-thinker/static/files/*
+commonplace/static/files/*
 
 lib-cov
 *.seed

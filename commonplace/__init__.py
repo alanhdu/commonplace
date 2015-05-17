@@ -4,7 +4,7 @@ from flaskext.markdown import Markdown
 
 app = Flask(__name__)
 Markdown(app)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:////home/alan/workspace/thinker/test.db"
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:////home/alan/workspace/commonplace/test.db"
 db = SQLAlchemy(app)
 
 from .schema import Note, Tag, Link, tags

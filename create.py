@@ -4,7 +4,7 @@ import os
 
 from dateutil.parser import parse as dateparse
 
-from thinker import db, Note, Tag, Link
+from commonplace import db, Note, Tag, Link
 
 
 def create_note(path):
