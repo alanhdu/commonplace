@@ -91,18 +91,21 @@ class Annotation(db.Model):
 
     def to_annotatejs(self):
         note = self.source
-        start = note.text.find("|@{}|".format(self.id))
+
+        begin = "|@{}|".format(self.id)
+
+        start = note.text.find(begin)
         end = note.text.find("|@|", start)
         offset = note.offset(start)
 
         return {
             "id": self.id,
             "text": self.text,
-            "quote": note.markdown[start - offset: end - offset],
+            "quote": note.markdown[start - offset: end - offset - len(begin)],
             "ranges": [{
                 "start": "",
                 "end": "",
                 "startOffset": start - offset,
-                "endOffset": end- - offset 
+                "endOffset": end- - offset - len(begin)
             }]
         }
