@@ -1,9 +1,7 @@
 import json
 import re
 
-import ipdb
-
-from flask import Blueprint, request, redirect, url_for, abort
+from flask import Blueprint, request, redirect, url_for
 import toolz
 
 from .. import db, Note, Tag, Annotation
@@ -13,6 +11,7 @@ api = Blueprint('api', __name__)
 
 def _pick(whitelist, d):
     return toolz.keyfilter(lambda u: u in whitelist, d)
+
 
 def _update_note(note, request):
     whitelist = {"title", "text", "source", "category"}
@@ -44,12 +43,14 @@ def update_note(note_id):
 
     return redirect(url_for("show_note", note_id=note.id))
 
+
 @api.route("/note/new", methods=["PUT"])
 def create_note():
     note = Note()
     _update_note(note, request)
 
     return redirect(url_for("show_note", note_id=note.id))
+
 
 @api.route("/note/<int:note_id>/annotations/<int:annotation_id>",
            methods=["GET", "PUT", "DELETE"])
@@ -80,11 +81,12 @@ def annotation_read(note_id, annotation_id):
                       annotation_id=annotation.id)
         return redirect(url)
 
+
 @api.route("/note/<int:note_id>/annotations", methods=["POST", "GET"])
 def annotation_index(note_id):
     note = Note.query.get(note_id)
     if request.method == "GET":
-        return json.dumps([annotation.to_annotatejs() 
+        return json.dumps([annotation.to_annotatejs()
                            for annotation in note.annotations])
     elif request.method == "POST":
         data = request.get_json()
@@ -97,7 +99,7 @@ def annotation_index(note_id):
 
         offset = note.offset(start)
 
-        note.text = "".join([note.text[:start + offset], 
+        note.text = "".join([note.text[:start + offset],
                              "|@{}|".format(annotation.id),
                              note.text[start + offset: end + offset],
                              "|@|",
@@ -108,4 +110,3 @@ def annotation_index(note_id):
         url = url_for("api.annotation_read", note_id=note_id,
                       annotation_id=annotation.id)
         return redirect(url)
-

@@ -2,18 +2,18 @@ from collections import deque
 import datetime as dt
 import re
 
-from flask import url_for
 import markdown
 
 from . import db
 
 tags = db.Table("tags",
-            db.Column("tag_id", db.Integer, db.ForeignKey("tag.id")),
-            db.Column("note_id", db.Integer, db.ForeignKey("note.id")))
+                db.Column("tag_id", db.Integer, db.ForeignKey("tag.id")),
+                db.Column("note_id", db.Integer, db.ForeignKey("note.id")))
 
 _annotate_begin = re.compile(r"\|@\d+\|")
 _annotate_end = re.compile(r"\|@\|")
 _annotate = re.compile(r"\|@(\d+)\|(.*?)\|@\|", re.DOTALL)
+
 
 class Note(db.Model):
     __tablename__ = "note"
@@ -62,12 +62,12 @@ class Note(db.Model):
                + sum(map(len, _annotate_end.findall(self.text[:start])))
 
 
-
 class Tag(db.Model):
     __tablename__ = "tag"
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True, index=True)
+
 
 class Annotation(db.Model):
     __tablename__ = "annotation"
@@ -85,9 +85,9 @@ class Annotation(db.Model):
     text = db.Column(db.Text)
 
     source = db.relationship("Note", foreign_keys=source_id,
-                          backref=db.backref("annotations"))
+                             backref=db.backref("annotations"))
     ref = db.relationship("Note", foreign_keys=ref_id,
-                           backref=db.backref("incoming"))
+                          backref=db.backref("incoming"))
 
     def to_annotatejs(self):
         note = self.source
@@ -106,6 +106,6 @@ class Annotation(db.Model):
                 "start": "",
                 "end": "",
                 "startOffset": start - offset,
-                "endOffset": end- - offset - len(begin)
+                "endOffset": end - offset - len(begin)
             }]
         }

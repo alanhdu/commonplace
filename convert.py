@@ -8,10 +8,10 @@ import shutil
 from dateutil.parser import parse as dateparse
 from html2text import html2text
 from lxml import html, etree
-import toolz
 from slugify import slugify_filename
 
 _link = re.compile(r"\[.*?\]\((.*?)\)", re.DOTALL)
+
 
 def html2md(h):
     md = html2text(h)
@@ -20,6 +20,7 @@ def html2md(h):
         md = md.replace(s, s.replace("\n", "").replace(" ", "%20"))
 
     return md.strip()
+
 
 def process_data(meta):
     data = {}
@@ -37,12 +38,14 @@ def process_data(meta):
         elif key in {"Author", "Location"}:
             pass
         else:
-            raise KeyError(key + " not handled") 
+            raise KeyError(key + " not handled")
     return data
+
 
 def process(note_name, category="misc", evernote="data/_evernote_raw"):
     files_path = note_name + "_files/"
-    fpath = "/static/files/" + hashlib.md5(note_name.encode()).hexdigest() + "/"
+    hexdigest = hashlib.md5(note_name.encode()).hexdigest()
+    fpath = "/static/files/" + hexdigest + "/"
     with open(os.path.join(evernote, category, note_name + ".html")) as fin:
         root = html.fromstring(fin.read())
 
