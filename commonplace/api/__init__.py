@@ -14,7 +14,7 @@ def _pick(whitelist, d):
 
 
 def _update_note(note, request):
-    whitelist = {"title", "text", "source", "category"}
+    whitelist = {"title", "text", "source", "category", "fpath"}
     for key, value in _pick(whitelist, request.form).items():
         setattr(note, key, value.replace("\r\n", "\n"))
 
@@ -44,7 +44,7 @@ def update_note(note_id):
     return redirect(url_for("show_note", note_id=note.id))
 
 
-@api.route("/note/new", methods=["PUT"])
+@api.route("/note/new", methods=["PUT", "POST"])
 def create_note():
     note = Note()
     _update_note(note, request)

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}
+<title> New Note </title>
+{% endblock %}
+
+{% block content %}
+
+<form action="/api/note/new" method="post">
+    Title <input type="text" name="title" size=60 value=""> <br/>
+    Source <input type="text" name="source" size=60 value=""> <br/>
+    Category <input type="text" name="category" size=60 value=""> <br/>
+    Tags <input type="text" name="tags" size=60 value=""> <br/>
+    Fpath <input type="text" name="fpath" size=80 value=""> <br/>
+
+    Note: <div id="epiceditor-note"> </div>
+        <textarea style="display: None" name="text" id="note-md"></textarea>
+
+    <input type="submit">
+
+</form>
+
+
+<script src="/static/js/epiceditor.min.js"> </script>
+<script type="text/javascript">
+    var note_opts = {
+        container: 'epiceditor-note',
+        textarea: 'note-md',
+        basePath: '/static/epiceditor',
+    };
+    var note_editor = new EpicEditor(note_opts).load();
+
+</script>
+{% endblock %}

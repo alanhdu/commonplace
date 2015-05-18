@@ -18,8 +18,11 @@ app.register_blueprint(api, url_prefix="/api")
 def index():
     return render_template("base.html")
 
+@app.route("/note/new/")
+def new_note():
+    return render_template("note_new.html")
 
-@app.route("/note/<int:note_id>")
+@app.route("/note/<int:note_id>/")
 def show_note(note_id):
     note = Note.query.filter(Note.id == note_id).first()
     if not note:
