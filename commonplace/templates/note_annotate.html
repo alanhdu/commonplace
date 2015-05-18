@@ -43,7 +43,7 @@
 <script type="text/javascript">
     var note_ann = $('#note-md').annotator();
     note_ann.annotator("addPlugin", "Store", {
-        prefix: "/api/annotations",
+        prefix: "/api/note/{{ note.id }}",
         annotationData: { note_id: {{ note.id }} },
     });
 

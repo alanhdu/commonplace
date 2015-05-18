@@ -17,7 +17,7 @@ def _pick(whitelist, d):
 def _update_note(note, request):
     whitelist = {"title", "text", "source", "category"}
     for key, value in _pick(whitelist, request.form).items():
-        setattr(note, key, value)
+        setattr(note, key, value.replace("\r\n", "\n"))
 
     tags = set(json.loads(request.form["tags"].replace("'", '"')))
 
@@ -51,10 +51,11 @@ def create_note():
 
     return redirect(url_for("show_note", note_id=note.id))
 
-@api.route("/annotations/annotations/<int:annotation_id>",
+@api.route("/note/<int:note_id>/annotations/<int:annotation_id>",
            methods=["GET", "PUT", "DELETE"])
-def annotation_read(annotation_id):
+def annotation_read(note_id, annotation_id):
     annotation = Annotation.query.get(annotation_id)
+    assert annotation.source.id == note_id
 
     if request.method == "GET":
         return json.dumps(annotation.to_annotatejs())
@@ -64,9 +65,9 @@ def annotation_read(annotation_id):
 
         _find = re.compile(r"\|@{}\|(.*?)\|@\|".format(annotation_id),
                            re.DOTALL)
-        note.text = _find.sub("\1", note.text)
-        db.session.add(note)
+        note.text = _find.sub(r"\1", note.text)
 
+        db.session.add(note)
         db.session.commit()
 
         return "", 204  # intentional no response
@@ -75,27 +76,27 @@ def annotation_read(annotation_id):
         db.session.add(annotation)
         db.session.commit()
 
-        url = url_for("api.annotation_read", annotation_id=annotation.id)
+        url = url_for("api.annotation_read", note_id=note_id,
+                      annotation_id=annotation.id)
         return redirect(url)
 
-@api.route("/annotations/annotations", methods=["POST", "GET"])
-def annotation_index():
+@api.route("/note/<int:note_id>/annotations", methods=["POST", "GET"])
+def annotation_index(note_id):
+    note = Note.query.get(note_id)
     if request.method == "GET":
         return json.dumps([annotation.to_annotatejs() 
-                           for annotation in Annotation.query.all()])
+                           for annotation in note.annotations])
     elif request.method == "POST":
         data = request.get_json()
         start = data["ranges"][0]["startOffset"]
         end = data["ranges"][0]["endOffset"]
 
-        note = Note.query.get(data["note_id"])
-
-        annotation = Annotation(text=data["text"], source_id=data["note_id"])
+        annotation = Annotation(text=data["text"], source_id=note_id)
         db.session.add(annotation)
         db.session.flush()
 
         offset = note.offset(start)
-        print(note.text[start + offset: end + offset], offset, start, end)
+
         note.text = "".join([note.text[:start + offset], 
                              "|@{}|".format(annotation.id),
                              note.text[start + offset: end + offset],
@@ -104,6 +105,7 @@ def annotation_index():
         db.session.add(note)
         db.session.commit()
 
-        url = url_for("api.annotation_read", annotation_id=annotation.id)
+        url = url_for("api.annotation_read", note_id=note_id,
+                      annotation_id=annotation.id)
         return redirect(url)
 

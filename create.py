@@ -11,7 +11,7 @@ def create_note(path):
     with open(os.path.join(path, "data.json")) as fin:
         data = json.load(fin)
     with open(os.path.join(path, "note.md")) as fin:
-        data["text"] = fin.read()
+        data["text"] = fin.read().replace("\r\n", "\n")
 
     note = Note.query.filter(Note.title == data["title"]).first()
     if not note:
@@ -20,7 +20,7 @@ def create_note(path):
     for key, value in data.items():
         if key in {"created", "updated"}:
             value = dateparse(value)
-        if key not in {"tags"}:
+        elif key not in {"tags"}:
             setattr(note, key, value)
 
     for tag in data.get("tags", []):
