@@ -1,5 +1,9 @@
+from collections import deque
 import datetime as dt
 import re
+
+import ipdb
+import markdown
 
 from . import db
 
@@ -9,6 +13,7 @@ tags = db.Table("tags",
 
 _annotate_begin = re.compile(r"\|@\d+\|")
 _annotate_end = re.compile(r"\|@\|")
+_annotate = re.compile(r"\|@(\d+)\|(.*?)\|@\|", re.DOTALL)
 
 class Note(db.Model):
     __tablename__ = "note"
@@ -31,6 +36,26 @@ class Note(db.Model):
     @property
     def markdown(self):
         return _annotate_begin.sub("", _annotate_end.sub("", self.text))
+
+    @property
+    def html(self):
+        prev = 0
+        s = deque()
+        for match in _annotate.finditer(self.text):
+            annotation = Annotation.query.get(int(match.group(1)))
+            start, end = match.start(), match.end()
+
+            s.append(self.text[prev:start])
+            s.append("<span>")
+            s.append(match.group(2))
+            s.append("</span><span class='marginnote'>")
+            s.append(annotation.text)
+            s.append("</span>")
+
+            prev = end
+        s.append(self.text[prev:])
+
+        return markdown.markdown("".join(s))
 
     def offset(self, start):
         return sum(map(len, _annotate_begin.findall(self.text[:start]))) \
@@ -60,7 +85,7 @@ class Annotation(db.Model):
     text = db.Column(db.Text)
 
     source = db.relationship("Note", foreign_keys=source_id,
-                          backref=db.backref("outgoing"))
+                          backref=db.backref("annotations"))
     ref = db.relationship("Note", foreign_keys=ref_id,
                            backref=db.backref("incoming"))
 

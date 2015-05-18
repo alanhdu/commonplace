@@ -59,7 +59,14 @@ def annotation_read(annotation_id):
     if request.method == "GET":
         return json.dumps(annotation.to_annotatejs())
     elif request.method == "DELETE":
+        note = annotation.source
         db.session.delete(annotation)
+
+        _find = re.compile(r"\|@{}\|(.*?)\|@\|".format(annotation_id),
+                           re.DOTALL)
+        note.text = _find.sub("\1", note.text)
+        db.session.add(note)
+
         db.session.commit()
 
         return "", 204  # intentional no response
@@ -71,8 +78,7 @@ def annotation_read(annotation_id):
         url = url_for("api.annotation_read", annotation_id=annotation.id)
         return redirect(url)
 
-@api.route("/annotations/annotations", 
-           methods=["POST", "GET", "PUT", "DELETE"])
+@api.route("/annotations/annotations", methods=["POST", "GET"])
 def annotation_index():
     if request.method == "GET":
         return json.dumps([annotation.to_annotatejs() 
@@ -80,7 +86,7 @@ def annotation_index():
     elif request.method == "POST":
         data = request.get_json()
         start = data["ranges"][0]["startOffset"]
-        end = data["ranges"][0]["startOffset"]
+        end = data["ranges"][0]["endOffset"]
 
         note = Note.query.get(data["note_id"])
 
@@ -89,6 +95,7 @@ def annotation_index():
         db.session.flush()
 
         offset = note.offset(start)
+        print(note.text[start + offset: end + offset], offset, start, end)
         note.text = "".join([note.text[:start + offset], 
                              "|@{}|".format(annotation.id),
                              note.text[start + offset: end + offset],
@@ -99,5 +106,4 @@ def annotation_index():
 
         url = url_for("api.annotation_read", annotation_id=annotation.id)
         return redirect(url)
-
 
