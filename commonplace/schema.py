@@ -46,9 +46,9 @@ class Note(db.Model):
             start, end = match.start(), match.end()
 
             s.append(self.text[prev:start])
-            s.append("<span>")
+            s.append("<mark>")
             s.append(match.group(2))
-            s.append("</span><span class='marginnote'>")
+            s.append("</mark><span class='marginnote'>")
             s.append(annotation.text)
             s.append("</span>")
 
