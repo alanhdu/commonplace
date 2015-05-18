@@ -33,7 +33,7 @@ def edit_note(note_id):
 
 @app.route("/note/<int:note_id>/annotate")
 def annotate_note(note_id):
-    note = Note.query.filter(Note.id == note_id).first()
+    note = Note.query.get(note_id)
     if not note:
         abort(404)
     return render_template("note_annotate.html", note=note)

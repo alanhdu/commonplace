@@ -27,13 +27,13 @@
                     </span>
                 </div>
                 {% if note.source %}
-                    <a href="{{ note.source }}"> {{ note.source }} </a>
+                    <a href="{{ note.source }}"> {{- note.source -}} </a>
                 {% endif %}
 
 	</header>
 	<section>
             <h2> Notes </h2>
-            <pre id="note-md"> {{ note.text }} </pre>
+            <pre id="note-md">{{- note.markdown -}}</pre>
 	</section>
 </article>
 
@@ -44,11 +44,11 @@
 <link rel="stylesheet" href="http://assets.annotateit.org/annotator/v1.1.0/annotator.min.css">
 <script type="text/javascript">
     var note_ann = $('#note-md').annotator();
-
-    $("#submit-annotations").click(function() {
-        var note = $("#note-md").text;
-        alert("hello!");
+    note_ann.annotator("addPlugin", "Store", {
+        prefix: "/api/annotations",
+        annotationData: { note_id: {{ note.id }} },
     });
+
 </script>
 
 {% endblock %}

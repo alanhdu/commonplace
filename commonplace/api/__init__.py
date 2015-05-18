@@ -1,9 +1,12 @@
 import json
+import re
 
-from flask import Blueprint, request, redirect, url_for
+import ipdb
+
+from flask import Blueprint, request, redirect, url_for, abort
 import toolz
 
-from .. import db, Note, Tag
+from .. import db, Note, Tag, Annotation
 
 api = Blueprint('api', __name__)
 
@@ -47,3 +50,54 @@ def create_note():
     _update_note(note, request)
 
     return redirect(url_for("show_note", note_id=note.id))
+
+@api.route("/annotations/annotations/<int:annotation_id>",
+           methods=["GET", "PUT", "DELETE"])
+def annotation_read(annotation_id):
+    annotation = Annotation.query.get(annotation_id)
+
+    if request.method == "GET":
+        return json.dumps(annotation.to_annotatejs())
+    elif request.method == "DELETE":
+        db.session.delete(annotation)
+        db.session.commit()
+
+        return "", 204  # intentional no response
+    elif request.method == "PUT":
+        annotation.text = request.get_json()["text"]
+        db.session.add(annotation)
+        db.session.commit()
+
+        url = url_for("api.annotation_read", annotation_id=annotation.id)
+        return redirect(url)
+
+@api.route("/annotations/annotations", 
+           methods=["POST", "GET", "PUT", "DELETE"])
+def annotation_index():
+    if request.method == "GET":
+        return json.dumps([annotation.to_annotatejs() 
+                           for annotation in Annotation.query.all()])
+    elif request.method == "POST":
+        data = request.get_json()
+        start = data["ranges"][0]["startOffset"]
+        end = data["ranges"][0]["startOffset"]
+
+        note = Note.query.get(data["note_id"])
+
+        annotation = Annotation(text=data["text"], source_id=data["note_id"])
+        db.session.add(annotation)
+        db.session.flush()
+
+        offset = note.offset(start)
+        note.text = "".join([note.text[:start + offset], 
+                             "|@{}|".format(annotation.id),
+                             note.text[start + offset: end + offset],
+                             "|@|",
+                             note.text[end + offset:]])
+        db.session.add(note)
+        db.session.commit()
+
+        url = url_for("api.annotation_read", annotation_id=annotation.id)
+        return redirect(url)
+
+
