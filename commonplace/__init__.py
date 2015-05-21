@@ -8,7 +8,7 @@ uri = "sqlite:////home/alan/workspace/commonplace/test.db"
 app.config["SQLALCHEMY_DATABASE_URI"] = uri
 db = SQLAlchemy(app)
 
-from .schema import Note, Tag, Annotation, tags   # noqa
+from .schema import Note, Tag, Annotation, Category, tags   # noqa
 from .api import api  # noqa
 
 app.register_blueprint(api, url_prefix="/api")
@@ -18,25 +18,12 @@ app.register_blueprint(api, url_prefix="/api")
 def index():
     return render_template("base.html")
 
-@app.route("/note/new/")
-def new_note():
-    return render_template("note_new.html")
-
 @app.route("/note/<int:note_id>/")
 def show_note(note_id):
     note = Note.query.filter(Note.id == note_id).first()
     if not note:
         abort(404)
     return render_template("note.html", note=note)
-
-
-@app.route("/note/<int:note_id>/edit")
-def edit_note(note_id):
-    note = Note.query.filter(Note.id == note_id).first()
-    if not note:
-        abort(404)
-    return render_template("note_edit.html", note=note,
-                           tags=[tag.name for tag in note.tags])
 
 
 @app.route("/note/<int:note_id>/annotate")

@@ -1,8 +1,9 @@
 from collections import deque
 import datetime as dt
 import re
+import os
 
-import markdown
+from slugify import slugify_filename
 
 from . import db
 
@@ -20,22 +21,22 @@ class Note(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     title = db.Column(db.String, nullable=False, unique=True)
-    text = db.Column(db.Text, nullable=False)
-    category = db.Column(db.String, nullable=False, default="misc")
+    category_id = db.Column(db.Integer, db.ForeignKey("category.id"))
+    tags = db.relationship("Tag", secondary=tags,
+                           backref=db.backref("notes", lazy="dynamic"))
 
     created = db.Column(db.DateTime, nullable=False, default=dt.datetime.now)
     updated = db.Column(db.DateTime, nullable=False, default=dt.datetime.now,
                         onupdate=dt.datetime.now)
-
-    source = db.Column(db.String, nullable=True)
-    fpath = db.Column(db.String, nullable=True, unique=True)
-
-    tags = db.relationship("Tag", secondary=tags,
-                           backref=db.backref("notes", lazy="dynamic"))
+    @property
+    def path(self):
+        return os.path.join('data/scholar', self.category.name,
+                            slugify_filename(self.title))
 
     @property
     def markdown(self):
-        return _annotate_begin.sub("", _annotate_end.sub("", self.text))
+        with open(self.path) as fin:
+            return _annotate_begin.sub("", _annotate_end.sub("", fin.read()))
 
     @property
     def html(self):
@@ -55,7 +56,7 @@ class Note(db.Model):
             prev = end
         s.append(self.text[prev:])
 
-        return markdown.markdown("".join(s))
+        return "".join(s)
 
     def offset(self, start):
         return sum(map(len, _annotate_begin.findall(self.text[:start]))) \
@@ -67,6 +68,14 @@ class Tag(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True, index=True)
+
+class Category(db.Model):
+    __tablename__ = "category"
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, unique=True, index=True)
+    notes = db.relationship("Note", backref="category", lazy="dynamic")
+
 
 
 class Annotation(db.Model):
