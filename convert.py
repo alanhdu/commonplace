@@ -9,18 +9,14 @@ from dateutil.parser import parse as dateparse
 from html2text import html2text
 from lxml import html, etree
 from slugify import slugify_filename
+import pypandoc
 
 _link = re.compile(r"\[.*?\]\((.*?)\)", re.DOTALL)
 
 
 def html2md(h):
-    md = html2text(h)
-    for match in _link.finditer(md):
-        s = match.group(1)
-        md = md.replace(s, s.replace("\n", "").replace(" ", "%20"))
-
+    md = pypandoc.convert(h, "markdown", "html")
     return md.strip()
-
 
 def process_data(meta):
     data = {}
@@ -45,7 +41,6 @@ def process_data(meta):
 def process(note_name, category="misc", evernote="data/_evernote_raw"):
     files_path = note_name + "_files/"
     hexdigest = hashlib.md5(note_name.encode()).hexdigest()
-    fpath = "/static/files/" + hexdigest + "/"
     with open(os.path.join(evernote, category, note_name + ".html")) as fin:
         root = html.fromstring(fin.read())
 
@@ -57,12 +52,12 @@ def process(note_name, category="misc", evernote="data/_evernote_raw"):
 
     for a in main.xpath("//a"):
         if 'href' in a.attrib and files_path in a.attrib["href"]:
-            href = a.attrib["href"].replace(files_path, fpath)
+            href = a.attrib["href"].replace(files_path, "_files/")
             a.attrib["href"] = href
 
     for img in main.xpath("//img"):
         if 'src' in img.attrib and files_path in img.attrib["src"]:
-            src = img.attrib["src"].replace(files_path, fpath)
+            src = img.attrib["src"].replace(files_path, "_files/")
             img.attrib["src"] = src
 
     text = html2md(etree.tostring(main).decode())
@@ -72,12 +67,9 @@ def process(note_name, category="misc", evernote="data/_evernote_raw"):
         os.makedirs(path)
 
     if os.path.isdir(os.path.join(evernote, category, files_path)):
-        newpath = "commonplace" + fpath
-        if os.path.isdir(newpath):
-            shutil.rmtree(newpath)
-        shutil.copytree(os.path.join(evernote, category, files_path),
-                        newpath)
-        data["fpath"] = fpath
+        if os.path.isdir(path):
+            shutil.rmtree(path)
+        shutil.copytree(os.path.join(evernote, category, files_path), path + "/_files/")
 
     with open(os.path.join(path, "data.json"), "w") as fout:
         json.dump(data, fout, sort_keys=True, indent=4)
