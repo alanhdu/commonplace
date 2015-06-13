@@ -1,12 +1,10 @@
 import glob
-import hashlib
 import json
 import re
 import os
 import shutil
 
 from dateutil.parser import parse as dateparse
-from html2text import html2text
 from lxml import html, etree
 from slugify import slugify_filename
 import pypandoc
@@ -40,7 +38,6 @@ def process_data(meta):
 
 def process(note_name, category="misc", evernote="data/_evernote_raw"):
     files_path = note_name + "_files/"
-    hexdigest = hashlib.md5(note_name.encode()).hexdigest()
     with open(os.path.join(evernote, category, note_name + ".html")) as fin:
         root = html.fromstring(fin.read())
 
@@ -69,7 +66,8 @@ def process(note_name, category="misc", evernote="data/_evernote_raw"):
     if os.path.isdir(os.path.join(evernote, category, files_path)):
         if os.path.isdir(path):
             shutil.rmtree(path)
-        shutil.copytree(os.path.join(evernote, category, files_path), path + "/_files/")
+        old_path = os.path.join(evernote, category, files_path)
+        shutil.copytree(old_path, path + "/_files/")
 
     with open(os.path.join(path, "data.json"), "w") as fout:
         json.dump(data, fout, sort_keys=True, indent=4)

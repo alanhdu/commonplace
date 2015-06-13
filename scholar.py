@@ -1,15 +1,12 @@
 import os
-import sys
 
-from dateutil.parser import parse as dateparse
 import frontmatter
 import toolz
 
 from commonplace import db, Note, Tag, Annotation, Link
 
-keys = {"title", "tags", "annotations", "created", "category", 
+keys = {"title", "tags", "annotations", "created", "category",
         "author", "source"}
-
 
 def create_note(path):
     note = Note.query.filter(Note.path == path).first()
@@ -25,7 +22,7 @@ def create_note(path):
     bad_keys = set(data.metadata) - attributes
     if bad_keys:
         msg = "Unexpected frontmatter found on {}:\n>>> {}"
-        msg = msg.format(path, bad_key)
+        msg = msg.format(path, bad_keys)
         raise ValueError(msg)
 
     for key in ["title", "source", "author", "created", "updated", "category"]:

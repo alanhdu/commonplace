@@ -1,7 +1,6 @@
 from collections import deque
 import datetime as dt
 import re
-import os
 
 import subprocess
 
@@ -61,8 +60,8 @@ class Note(db.Model):
         return "".join(s)
 
     def offset(self, start):
-        return sum(map(len, _annotate_begin.findall(self.text[:start]))) \
-               + sum(map(len, _annotate_end.findall(self.text[:start])))
+        return (sum(map(len, _annotate_begin.findall(self.text[:start]))) +
+                sum(map(len, _annotate_end.findall(self.text[:start]))))
 
 class Tag(db.Model):
     __tablename__ = "tag"
@@ -72,7 +71,7 @@ class Tag(db.Model):
 
 class Annotation(db.Model):
     __tablename__ = "annotation"
-    __table_args__ = (db.UniqueConstraint("source_id", "number", name="_unique"),)
+    __table_args__ = (db.UniqueConstraint("source_id", "number"), )
 
     id = db.Column(db.Integer, primary_key=True)
 
