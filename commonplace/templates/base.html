@@ -20,31 +20,47 @@
 
 
         <header>
-          <nav class="group">
-                  <a href="/"><i class="fa fa-home"></i>Home</a>
-                  <a href="/tag/"><i class="fa fa-tags"></i>Tags</a>
-                  <a href="/category/"><i class="fa fa-book"></i>Categories</a>
+            <nav class="group">
+                <a href="/"><i class="fa fa-home"></i>Home</a>
+                <a href="/tag/"><i class="fa fa-tags"></i>Tags</a>
+                <a href="/category/"><i class="fa fa-book"></i>Categories</a>
           </nav>
         </header>
 
-      <section class="content">
-          {% block content %}
-          {% endblock %}
-      </section>
+        <section class="content">
+            {% block content %}
+            {% endblock %}
+        </section>
 
-      {% block scripts %}
-      <!-- script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML-full"> </script>
-      <script type="text/x-mathjax-config">
-        MathJax.Hub.Config({
-            "HTML-CSS": {
-                styles: {
-                    '.MathJax_Display': {
-                        "margin": 0
+        {% block scripts %}
+        {% raw %}
+        <script type="text/x-mathjax-config">
+            MathJax.Hub.Config({
+                tex2jax: {
+                    processClass: "math"
+                },
+                Tex: {
+                    TagSide: "left",
+                    TagIndent: "1.2em",
+                    equationNumbers: { autoNumber: "AMS" },
+                    Macros: {
+                        ensuremath: ["#1",1],
+                        textsf: ["\\mathsf{\\text{#1}}",1],
+                        texttt: ["\\mathtt{\\text{#1}}",1]
                     }
+                },
+                "HTML-CSS": {
+                    scale: 100,
+                    availableFonts: ["TeX"], 
+                    preferredFont: "TeX",
+                    webFont: "TeX",
+                    imageFont: "TeX",
+                    EqnChunk: 1000
                 }
-            }
-        });
-      </script -->
-      {% endblock %}
+            });
+        </script>
+        <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML-full" type="text/javascript"></script>
+        {% endraw %}
+        {% endblock %}
     </body>
 </html>
