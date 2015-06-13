@@ -1,14 +1,12 @@
 from flask import Flask, render_template, abort
 from flask.ext.sqlalchemy import SQLAlchemy
-from flaskext.markdown import Markdown
 
 app = Flask(__name__)
-Markdown(app)
 uri = "sqlite:////home/alan/workspace/commonplace/test.db"
 app.config["SQLALCHEMY_DATABASE_URI"] = uri
 db = SQLAlchemy(app)
 
-from .schema import Note, Tag, Annotation, Category, tags   # noqa
+from .schema import Note, Tag, Annotation, Link, tags   # noqa
 from .api import api  # noqa
 
 app.register_blueprint(api, url_prefix="/api")
@@ -24,14 +22,6 @@ def show_note(note_id):
     if not note:
         abort(404)
     return render_template("note.html", note=note)
-
-
-@app.route("/note/<int:note_id>/annotate")
-def annotate_note(note_id):
-    note = Note.query.get(note_id)
-    if not note:
-        abort(404)
-    return render_template("note_annotate.html", note=note)
 
 
 @app.route("/tag/<tag_name>")

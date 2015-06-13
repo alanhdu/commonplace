@@ -3,14 +3,15 @@ import datetime as dt
 import re
 import os
 
-from slugify import slugify_filename
 import subprocess
 
 from . import db
 
-tags = db.Table("tags",
-                db.Column("tag_id", db.Integer, db.ForeignKey("tag.id")),
-                db.Column("note_id", db.Integer, db.ForeignKey("note.id")))
+tags = db.Table(
+    "tags",
+    db.Column("tag_id", db.Integer, db.ForeignKey("tag.id")),
+    db.Column("note_id", db.Integer, db.ForeignKey("note.id"))
+)
 
 _annotate_begin = re.compile(r"\|@\d+\|")
 _annotate_end = re.compile(r"\|@\|")
@@ -21,36 +22,34 @@ class Note(db.Model):
     __tablename__ = "note"
     id = db.Column(db.Integer, primary_key=True)
 
-    title = db.Column(db.String, nullable=False, unique=True)
-    category_id = db.Column(db.Integer, db.ForeignKey("category.id"))
+    title = db.Column(db.String, nullable=False, unique=True, index=True)
+    source = db.Column(db.String)
+    category = db.Column(db.String, nullable=False, index=True)
     tags = db.relationship("Tag", secondary=tags,
                            backref=db.backref("notes", lazy="dynamic"))
+    path = db.Column(db.String, nullable=False, unique=True)
 
-    created = db.Column(db.DateTime, nullable=False, default=dt.datetime.now)
-    updated = db.Column(db.DateTime, nullable=False, default=dt.datetime.now,
-                        onupdate=dt.datetime.now)
-    @property
-    def path(self):
-        return os.path.join('data/temp', self.category.name,
-                            slugify_filename(self.title), "note.scholmd")
+    created = db.Column(db.Date, nullable=False)
+    updated = db.Column(db.Date, nullable=False)
 
     @property
     def markdown(self):
         with open(self.path) as fin:
-            return _annotate_begin.sub("", _annotate_end.sub("", fin.read()))
+            s = fin.read()
+        return _annotate_begin.sub("", _annotate_end.sub("", s))
 
     @property
     def html(self):
-        prev = 0
         s = deque()
 
-        args=  ["scholdoc", "-t", "html", "--no-standalone", self.path]
+        args = ["scholdoc", "-t", "html", "--no-standalone", self.path]
         html = subprocess.check_output(args).decode()
+        prev = 0
         for match in _annotate.finditer(html):
             annotation = Annotation.query.get(int(match.group(1)))
             start, end = match.start(), match.end()
 
-            s.append(self.text[prev:start])
+            s.append(html[prev:start])
             s.append("<mark>")
             s.append(match.group(2))
             s.append("</mark><span class='marginnote'>")
@@ -65,24 +64,15 @@ class Note(db.Model):
         return sum(map(len, _annotate_begin.findall(self.text[:start]))) \
                + sum(map(len, _annotate_end.findall(self.text[:start])))
 
-
 class Tag(db.Model):
     __tablename__ = "tag"
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, unique=True, index=True)
 
-class Category(db.Model):
-    __tablename__ = "category"
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, unique=True, index=True)
-    notes = db.relationship("Note", backref="category", lazy="dynamic")
-
-
-
 class Annotation(db.Model):
     __tablename__ = "annotation"
+    __table_args__ = (db.UniqueConstraint("source_id", "number", name="_unique"),)
 
     id = db.Column(db.Integer, primary_key=True)
 
@@ -90,34 +80,22 @@ class Annotation(db.Model):
     updated = db.Column(db.DateTime, nullable=False, default=dt.datetime.now,
                         onupdate=dt.datetime.now)
 
-    source_id = db.Column(db.Integer, db.ForeignKey("note.id"), index=True)
-    ref_id = db.Column(db.Integer, db.ForeignKey("note.id"), nullable=True)
-
     number = db.Column(db.Integer, index=True)
     text = db.Column(db.Text)
 
+    source_id = db.Column(db.Integer, db.ForeignKey("note.id"), index=True)
     source = db.relationship("Note", foreign_keys=source_id,
                              backref=db.backref("annotations"))
-    ref = db.relationship("Note", foreign_keys=ref_id,
-                          backref=db.backref("incoming"))
 
-    def to_annotatejs(self):
-        note = self.source
+class Link(db.Model):
+    __table__name = "link"
 
-        begin = "|@{}|".format(self.id)
+    id = db.Column(db.Integer, primary_key=True)
 
-        start = note.text.find(begin)
-        end = note.text.find("|@|", start)
-        offset = note.offset(start)
+    source_id = db.Column(db.Integer, db.ForeignKey("note.id"), index=True)
+    dest_id = db.Column(db.Integer, db.ForeignKey("note.id"), index=True)
 
-        return {
-            "id": self.id,
-            "text": self.text,
-            "quote": note.markdown[start - offset: end - offset - len(begin)],
-            "ranges": [{
-                "start": "",
-                "end": "",
-                "startOffset": start - offset,
-                "endOffset": end - offset - len(begin)
-            }]
-        }
+    source = db.relationship("Note", foreign_keys=source_id,
+                             backref=db.backref("outgoing_links"))
+    source = db.relationship("Note", foreign_keys=dest_id,
+                             backref=db.backref("incoming_links"))
