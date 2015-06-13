@@ -4,6 +4,7 @@ import re
 import os
 
 from slugify import slugify_filename
+import subprocess
 
 from . import db
 
@@ -30,8 +31,8 @@ class Note(db.Model):
                         onupdate=dt.datetime.now)
     @property
     def path(self):
-        return os.path.join('data/scholar', self.category.name,
-                            slugify_filename(self.title))
+        return os.path.join('data/temp', self.category.name,
+                            slugify_filename(self.title), "note.scholmd")
 
     @property
     def markdown(self):
@@ -42,7 +43,10 @@ class Note(db.Model):
     def html(self):
         prev = 0
         s = deque()
-        for match in _annotate.finditer(self.text):
+
+        args=  ["scholdoc", "-t", "html", "--no-standalone", self.path]
+        html = subprocess.check_output(args).decode()
+        for match in _annotate.finditer(html):
             annotation = Annotation.query.get(int(match.group(1)))
             start, end = match.start(), match.end()
 
@@ -54,8 +58,7 @@ class Note(db.Model):
             s.append("</span>")
 
             prev = end
-        s.append(self.text[prev:])
-
+        s.append(html[prev:])
         return "".join(s)
 
     def offset(self, start):
