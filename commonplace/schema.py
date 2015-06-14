@@ -45,15 +45,18 @@ class Note(db.Model):
         html = subprocess.check_output(args).decode()
         prev = 0
         for match in _annotate.finditer(html):
-            annotation = Annotation.query.get(int(match.group(1)))
+            num = int(match.group(1))
+            query = Annotation.query.filter(Annotation.source == self,
+                                            Annotation.number == num)
+            annotation = query.first()
             start, end = match.start(), match.end()
 
             s.append(html[prev:start])
-            s.append("<mark>")
-            s.append(match.group(2))
-            s.append("</mark><span class='marginnote'>")
+            s.append("<span class='marginnote'>")
             s.append(annotation.text)
-            s.append("</span>")
+            s.append("</span><mark>")
+            s.append(match.group(2))
+            s.append("</mark>")
 
             prev = end
         s.append(html[prev:])
