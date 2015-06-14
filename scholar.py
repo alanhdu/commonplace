@@ -33,13 +33,13 @@ def create_note(path):
         note.updated = note.created
 
     if "tags" in data.metadata:
+        note.tags = []
         for tag_name in data.metadata["tags"]:
             tag = Tag.query.filter(Tag.name == tag_name).first()
             if tag is None:
                 tag = Tag(name=tag_name)
                 db.session.add(tag)
-            if tag not in note.tags:
-                note.tags.append(tag)
+            note.tags.append(tag)
 
     annotation_links = deque()
     if "annotations" in data.metadata:
