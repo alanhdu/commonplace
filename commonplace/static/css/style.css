@@ -49,7 +49,7 @@ article {
     position: relative;
     padding-top: 0rem; }
 
-article > ul, p { font-size: 1.25rem;
+figcaption, article > ul, p { font-size: 1.25rem;
     line-height: 1.25;
     margin-top: 1.25rem;
     margin-bottom: 1.25rem;
@@ -73,7 +73,7 @@ sub { top: 0.4rem; }
 
 .fullwidth { max-width: 95%; } 
 
-figcaption, .sidenote, .marginnote {
+.scholmd-float-caption, .sidenote, .marginnote {
     float: right;
     clear: right;
     margin-right: -60%;
@@ -100,6 +100,7 @@ h1 {
 }
 
 h2 {
+    max-width: 55%;
     font-style: italic;
     font-weight: 400;
     font-size: 2.1rem;
@@ -109,6 +110,7 @@ h2 {
 }
 
 h3 {
+    max-width: 55%;
     font-style: italic;
     font-weight: 400;
     font-size: 1.8rem;
@@ -117,6 +119,7 @@ h3 {
     line-height: 1.088888888889; }
 
 h4 {
+    max-width: 55%;
     font-style: italic;
     font-weight: 400;
     font-size: 1.6rem;
@@ -125,6 +128,7 @@ h4 {
     line-height: 1.225; }
 
 h5 {
+    max-width: 55%;
     font-style: italic;
     font-weight: 400;
     font-size: 1.4rem;
@@ -133,6 +137,7 @@ h5 {
     line-height: 1.4; }
 
 h6 {
+    max-width: 55%;
     font-style: italic;
     font-weight: 400;
     font-size: 1.2rem;
@@ -182,7 +187,7 @@ sup.sidenote-number {
 
 span.newthought { font-variant: small-caps; }
 
-img {
+.scholmd-float-content img {
     max-width: 55%;
 }
 
