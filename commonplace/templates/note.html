@@ -5,32 +5,69 @@
 {% endblock %}
 
 {% block content %}
-
 <article>
-	<header>
-		<h1>{{ note.title }}</h1>
-                <div> Created: <time class="timeago postlist-meta" datetime="{{ note.created }}">
-                        <i class="fa fa-calendar"></i> {{ note.created }}
-                </time> </div>
-
-                <div> Updated: <time class="timeago postlist-meta" datetime="{{ note.updated }}">
-                    <i class="fa fa-calendar"></i> {{ note.updated }}
-                </time> </div>
-
-                <div> <strong> {{ note.category.name }} </strong> &ndash;
-                    <span class="tags">
-                        {% for tag in note.tags %}
-                        <span> <a href="{{ url_for('show_tag', tag_name=tag.name) }}">
-                                <i class="fa fa-tag"></i>{{ tag.name }}</a></span>
-                        {% endfor %}
-                    </span>
-                </div>
-                {% if note.source %}
-                    <a href="{{ note.source }}"> {{ note.source }} </a>
+    <header>
+        <h1>{{ note.title }}</h1>
+        <div> <strong> Created: </strong>
+            <time class="timeago postlist-meta" datetime="{{ note.created }}">
+                <i class="fa fa-calendar"></i> {{ note.created }}
+            </time> 
+        </div>
+        <div> <strong> Updated: </strong>
+            <time class="timeago postlist-meta" datetime="{{ note.updated }}">
+                <i class="fa fa-calendar"></i> {{ note.updated }}
+            </time>
+        </div>
+        <div> <strong> {{ note.category }} </strong> &ndash;
+            <span class="tags">
+                {% for tag in note.tags %}
+                <span> <a href="{{ url_for('show_tag', tag_name=tag.name) }}">
+                        <i class="fa fa-tag"></i>{{ tag.name }}</a></span>
+                {% endfor %}
+            </span>
+        </div>
+        <div> <strong> Links: </strong>
+            <ul>
+                {% for annotation in note.annotations %}
+                {% if annotation.dest != None %}
+                <li> <a href="{{ url_for('show_note', note_id=annotation.dest_id) }}"> {{ annotation.dest.title }} </a></li>
                 {% endif %}
-
-	</header>
-        {{ note.html | safe }}
+                {% endfor %}
+            </ul>
+        </div>
+        {% if note.source %} <a href="{{ note.source }}"> {{ note.source }} </a> {% endif %}
+    </header>
+    {{ note.html | safe }}
 </article>
-
 {% endblock content %}
+
+{% block tail_scripts %}
+{% raw %}
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            processClass: "math"
+        },
+        Tex: {
+            TagSide: "left",
+            TagIndent: "1.2em",
+            equationNumbers: { autoNumber: "AMS" },
+            Macros: {
+                ensuremath: ["#1",1],
+                textsf: ["\\mathsf{\\text{#1}}",1],
+                texttt: ["\\mathtt{\\text{#1}}",1]
+            }
+        },
+        "HTML-CSS": {
+            scale: 100,
+            availableFonts: ["TeX"], 
+            preferredFont: "TeX",
+            webFont: "TeX",
+            imageFont: "TeX",
+            EqnChunk: 1000
+        }
+    });
+</script>
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML-full" type="text/javascript"></script>
+{% endraw %}
+{% endblock %}
