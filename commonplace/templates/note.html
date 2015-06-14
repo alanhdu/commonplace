@@ -9,11 +9,11 @@
 <article>
 	<header>
 		<h1>{{ note.title }}</h1>
-                <div> Created: <time class="timeago postlist-meta" datetime="{{ note.created.ctime() }}">
+                <div> Created: <time class="timeago postlist-meta" datetime="{{ note.created }}">
                         <i class="fa fa-calendar"></i> {{ note.created }}
                 </time> </div>
 
-                <div> Updated: <time class="timeago postlist-meta" datetime="{{ note.updated.ctime() }}">
+                <div> Updated: <time class="timeago postlist-meta" datetime="{{ note.updated }}">
                     <i class="fa fa-calendar"></i> {{ note.updated }}
                 </time> </div>
 

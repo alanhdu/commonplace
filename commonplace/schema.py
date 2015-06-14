@@ -60,7 +60,12 @@ class Note(db.Model):
 
             prev = end
         s.append(html[prev:])
-        return "".join(s)
+        html = "".join(s)
+
+        for i in range(5, 0, -1):
+            html = html.replace("<h{}".format(i), "<h{}".format(i + 1))
+
+        return html
 
     def offset(self, start):
         return (sum(map(len, _annotate_begin.findall(self.text[:start]))) +
