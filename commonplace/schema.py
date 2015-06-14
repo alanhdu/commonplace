@@ -5,6 +5,7 @@ import re
 import frontmatter
 import markdown
 from external.mdx_math import MathExtension
+from flask import url_for
 
 from . import db
 
@@ -46,9 +47,12 @@ class Note(db.Model):
         with open(self.path) as fin:
             post = frontmatter.load(fin)
 
-        extensions = ["markdown.extensions.footnotes", MathExtension()]
+        extensions = ["markdown.extensions.footnotes", MathExtension(),
+                      "markdown.extensions.smarty"]
         html = markdown.markdown(post.content, extensions=extensions)
         prev = 0
+
+        annotations = {a["id"]: a for a in post.metadata.get("annotations", [])}
         for match in _annotate.finditer(html):
             num = int(match.group(1))
             query = Annotation.query.filter(Annotation.source == self,
@@ -58,7 +62,13 @@ class Note(db.Model):
 
             s.append(html[prev:start])
             s.append("<span class='marginnote'>")
-            s.append(annotation.text)
+            if annotation.dest_id is not None:
+                url = url_for("show_note", note_id=annotation.dest_id)
+                s.append("<a href='{}'>".format(url))
+                s.append(annotations[num].get("text", ""))
+                s.append("</a>")
+            else:
+                s.append(annotations[num].get("text", ""))
             s.append("</span><mark>")
             s.append(match.group(2))
             s.append("</mark>")
@@ -93,21 +103,12 @@ class Annotation(db.Model):
                         onupdate=dt.datetime.now)
 
     number = db.Column(db.Integer, index=True)
-    text = db.Column(db.Text)
 
-    source_id = db.Column(db.Integer, db.ForeignKey("note.id"), index=True)
+    source_id = db.Column(db.Integer, db.ForeignKey("note.id"), index=True, 
+                          nullable=False)
+    dest_id = db.Column(db.Integer, db.ForeignKey("note.id"), index=True,
+                        nullable=True)
+
     source = db.relationship("Note", foreign_keys=source_id,
                              backref=db.backref("annotations"))
-
-class Link(db.Model):
-    __table__name = "link"
-
-    id = db.Column(db.Integer, primary_key=True)
-
-    source_id = db.Column(db.Integer, db.ForeignKey("note.id"), index=True)
-    dest_id = db.Column(db.Integer, db.ForeignKey("note.id"), index=True)
-
-    source = db.relationship("Note", foreign_keys=source_id,
-                             backref=db.backref("outgoing_links"))
-    source = db.relationship("Note", foreign_keys=dest_id,
-                             backref=db.backref("incoming_links"))
+    dest = db.relationship("Note", foreign_keys=dest_id)
