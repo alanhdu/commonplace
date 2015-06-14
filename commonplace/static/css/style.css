@@ -1,20 +1,17 @@
 @font-face { 
     font-family: ETBembo;
-    src: url("/static/fonts/ETBembo-RomanLF.ttf");
+    src: url("../fonts/ETBembo-RomanLF.ttf");
 }
 
-html { font-size: 11px; }
-
-@media screen and (min-width: 800px)  { html{ font-size: 12px; }}
-@media screen and (min-width: 900px)  { html{ font-size: 13px; }}
-@media screen and (min-width: 1000px) { html{ font-size: 14px; }}
-@media screen and (min-width: 1100px) { html{ font-size: 15px; }}
-@media screen and (min-width: 1200px) { html{ font-size: 16px; }}
-@media screen and (min-width: 1300px) { html{ font-size: 17px; }}
+html { font-size: 13px; }
+@media screen and (min-width: 800px)  { html{ font-size: 14px; }}
+@media screen and (min-width: 1000px)  { html{ font-size: 15px; }}
+@media screen and (min-width: 1200px)  { html{ font-size: 16px; }}
+@media screen and (min-width: 1400px) { html{ font-size: 17px; }}
 
 body {
     width: 90%;
-    margin-left: auto;
+    margin-left: 0;
     margin-right: auto;
     padding-left: 5%;
     font-family: ETBembo, Palatino, "Palatino Linotype", "Palatino LT STD", "Book Antiqua", Georgia, serif;
@@ -52,7 +49,7 @@ article {
     position: relative;
     padding-top: 0rem; }
 
-p { font-size: 1.25rem;
+article > ul, p { font-size: 1.25rem;
     line-height: 1.25;
     margin-top: 1.25rem;
     margin-bottom: 1.25rem;
@@ -60,8 +57,8 @@ p { font-size: 1.25rem;
     padding-right: 0;
     vertical-align: baseline; }
 
-@media screen and (max-width: 600px) { p { width: 70%; }}
-@media screen and (max-width: 400px){ p { width: 90%; }}
+@media screen and (max-width: 600px) { ul, p { width: 70%; }}
+@media screen and (max-width: 400px) { ul, p { width: 90%; }}
 
 a { color: #222; }
 
@@ -76,7 +73,7 @@ sub { top: 0.4rem; }
 
 .fullwidth { max-width: 95%; } 
 
-.sidenote, .marginnote {
+figcaption, .sidenote, .marginnote {
     float: right;
     clear: right;
     margin-right: -60%;
@@ -184,6 +181,14 @@ sup.sidenote-number {
       color: #f00000; }
 
 span.newthought { font-variant: small-caps; }
+
+img {
+    max-width: 55%;
+}
+
+mark {
+    background-color: #7DF;
+}
 
 /* LaTeX-logo-specific styling */
 .latex sub, .latex sup { text-transform: uppercase; }
