@@ -2,7 +2,9 @@ from collections import deque
 import datetime as dt
 import re
 
-import subprocess
+import frontmatter
+import markdown
+from external.mdx_math import MathExtension
 
 from . import db
 
@@ -41,8 +43,11 @@ class Note(db.Model):
     def html(self):
         s = deque()
 
-        args = ["scholdoc", "-t", "html", "--no-standalone", self.path]
-        html = subprocess.check_output(args).decode()
+        with open(self.path) as fin:
+            post = frontmatter.load(fin)
+
+        extensions = ["markdown.extensions.footnotes", MathExtension()]
+        html = markdown.markdown(post.content, extensions=extensions)
         prev = 0
         for match in _annotate.finditer(html):
             num = int(match.group(1))

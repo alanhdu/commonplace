@@ -57,9 +57,9 @@ def create_note(path):
     return ((note.id, link) for link in data.get("links", []))
 
 def get_files():
-    for path, __, files in os.walk("data/scholar/"):
+    for path, __, files in os.walk("data/"):
         for fname in files:
-            if not fname.endswith("scholmd"):
+            if not fname.endswith(".md"):
                 continue
             yield os.path.join(path, fname)
 
