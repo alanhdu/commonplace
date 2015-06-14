@@ -7,9 +7,6 @@ app.config["SQLALCHEMY_DATABASE_URI"] = uri
 db = SQLAlchemy(app)
 
 from .schema import Note, Tag, Annotation, tags   # noqa
-from .api import api  # noqa
-
-app.register_blueprint(api, url_prefix="/api")
 
 
 @app.route("/")
