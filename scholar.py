@@ -37,7 +37,8 @@ def create_note(path):
             if tag is None:
                 tag = Tag(name=tag_name)
                 db.session.add(tag)
-            note.tags.append(tag)
+            if tag not in note.tags:
+                note.tags.append(tag)
 
     if "annotations" in data.metadata:
         for a in data.metadata["annotations"]:
