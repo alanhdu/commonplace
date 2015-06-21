@@ -49,11 +49,10 @@ def create_note(path):
             annotation = query.first()
             if annotation is None:
                 annotation = Annotation(source=note, number=a["id"])
-                print("source_id", annotation.source_id)
 
             db.session.add(annotation)
             if "link" in a:
-                yield annotation.id, a["link"]
+                yield annotation, a["link"]
 
     db.session.add(note)
     db.session.commit()
@@ -71,15 +70,14 @@ if __name__ == "__main__":
     annotation_links = toolz.concat(create_note(f) for f in get_files())
     annotation_links = deque(annotation_links)   # force db update
 
-    for annotation_id, dest_title in annotation_links:
+    for annotation, dest_title in annotation_links:
         dest = Note.query.filter(Note.title == dest_title).first()
         if dest is None:
             source = Note.query.filter(Note.id == source_id).first()
             msg = "Unknown link to '{}' in {}".format(dest_title, source.title)
             raise ValueError(msg)
 
-        a = Annotation.query.filter(Annotation.id == annotation_id).first()
-        a.dest_id = dest.id
-        db.session.add(a)
+        annotation.dest_id = dest.id
+        db.session.add(annotation)
 
     db.session.commit()
