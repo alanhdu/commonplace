@@ -52,7 +52,8 @@ class Note(db.Model):
         html = markdown.markdown(post.content, extensions=extensions)
         prev = 0
 
-        annotations = {a["id"]: a for a in post.metadata.get("annotations", [])}
+        annotations = {a["id"]: a
+                       for a in post.metadata.get("annotations", [])}
         for match in _annotate.finditer(html):
             num = int(match.group(1))
             query = Annotation.query.filter(Annotation.source == self,
@@ -104,7 +105,7 @@ class Annotation(db.Model):
 
     number = db.Column(db.Integer, index=True)
 
-    source_id = db.Column(db.Integer, db.ForeignKey("note.id"), index=True, 
+    source_id = db.Column(db.Integer, db.ForeignKey("note.id"), index=True,
                           nullable=False)
     dest_id = db.Column(db.Integer, db.ForeignKey("note.id"), index=True,
                         nullable=True)

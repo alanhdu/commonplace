@@ -41,7 +41,6 @@ def create_note(path):
                 db.session.add(tag)
             note.tags.append(tag)
 
-    annotation_links = deque()
     if "annotations" in data.metadata:
         for a in data.metadata["annotations"]:
             query = Annotation.query.filter(Annotation.source_id == note.id,
@@ -73,7 +72,7 @@ if __name__ == "__main__":
     for annotation, dest_title in annotation_links:
         dest = Note.query.filter(Note.title == dest_title).first()
         if dest is None:
-            source = Note.query.filter(Note.id == source_id).first()
+            source = annotation.source
             msg = "Unknown link to '{}' in {}".format(dest_title, source.title)
             raise ValueError(msg)
 

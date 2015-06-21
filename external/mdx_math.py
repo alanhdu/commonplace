@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 
-'''
+"""
 Math extension for Python-Markdown
 ==================================
 
-Adds support for displaying math formulas using [MathJax](http://www.mathjax.org/).
+Adds support for displaying math formulas using
+[MathJax](http://www.mathjax.org/).
 
 Author: 2015, Dmitry Shachnev <mitya57@gmail.com>.
-'''
+"""
 
 import markdown
 
