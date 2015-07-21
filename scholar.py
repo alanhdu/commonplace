@@ -18,17 +18,19 @@ def create_note(path):
 
     db.session.autoflush = False
 
-    attributes = {"title", "source", "author", "created", "updated", "tags",
-                  "category", "annotations"}
+    attributes = {"title", "source", "author", "created", "tags", "category",
+                  "annotations"}
     bad_keys = set(data.metadata) - attributes
     if bad_keys:
         msg = "Unexpected frontmatter found on {}:\n>>> {}"
         msg = msg.format(path, bad_keys)
         raise ValueError(msg)
 
-    for key in ["title", "source", "author", "created", "updated", "category"]:
+    for key in ["title", "source", "author", "created", "category"]:
         if key in data.metadata:
             setattr(note, key, data.metadata[key])
+        else:
+            print("Missing {} in {}".format(key, path))
     if note.updated is None:
         note.updated = note.created
 

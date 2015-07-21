@@ -5,6 +5,7 @@ import re
 import frontmatter
 import markdown
 from external.mdx_math import MathExtension
+from external.poem import PoetryExtension
 from flask import url_for
 
 from . import db
@@ -48,7 +49,7 @@ class Note(db.Model):
             post = frontmatter.load(fin)
 
         extensions = ["markdown.extensions.footnotes", MathExtension(),
-                      "markdown.extensions.smarty"]
+                      PoetryExtension(), "markdown.extensions.smarty"]
         html = markdown.markdown(post.content, extensions=extensions)
         prev = 0
 

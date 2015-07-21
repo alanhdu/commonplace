@@ -207,3 +207,9 @@ mark {
     vertical-align: -0.2rem;
     margin-left: -0.36rem;
     margin-right: -0.15rem; }
+
+blockquote > p {
+    margin-top: 0px;
+    margin-bottom: 0px;
+    text-indent: -1em;
+}
