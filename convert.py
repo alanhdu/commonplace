@@ -1,7 +1,4 @@
-from collections import deque
 import os
-
-import toolz
 
 from commonplace import db, Note, Tag
 from asciidoc import AsciiDoc

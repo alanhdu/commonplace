@@ -37,6 +37,6 @@ class AsciiDoc():
 
     def to_html(self) -> str:
         p = subprocess.Popen([converter, "--out-file", "-", self.path],
-                             stdout = subprocess.PIPE)
+                             stdout=subprocess.PIPE)
         stdout, __ = p.communicate(timeout=2)
         return stdout.decode("utf-8")
