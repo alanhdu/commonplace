@@ -1,4 +1,6 @@
-from flask import Flask, render_template, abort
+import os
+
+from flask import Flask, render_template, abort, redirect, url_for
 from flask.ext.sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -13,9 +15,12 @@ from .schema import Note, Tag, tags   # noqa
 def index():
     return render_template("base.html")
 
-@app.route("/note/<int:note_id>/")
-def show_note(note_id):
-    note = Note.query.get_or_404(note_id)
+@app.route("/note/<path:path>")
+def show_note(path):
+    path, ext = os.path.splitext(path)
+    if ext:     # go to cannonical url
+        return redirect(url_for("show_note", path=path))
+    note = Note.query.filter(Note.path == path + ".adoc").first_or_404()
     return render_template("note.html", note=note)
 
 @app.route("/tag/")

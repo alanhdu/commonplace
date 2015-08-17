@@ -11,8 +11,8 @@
         <ul>
             {% for tag, count in tags %}
             <li> 
-                <a href="{{ url_for('show_tag', tag_name=tag.name) }}">
-                    {{ tag.name }} </a> ({{ count }})
+                <a href="{{ url_for('show_tag', tag_name=tag.name) }}"> {{ tag.name }} </a>
+                ({{ count }})
             </li>
             {% endfor %}
         </ul>
